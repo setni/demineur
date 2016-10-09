@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+ <div id="create">
+  <label for="wide">wide du démineur</label>
+  <select id="wide">
+    <option value="5" selected="selected">5</option>
+    <option value="10">10</option>
+    <option value="20">20</option>
+    <option value="50">50</option>
+  </select>
+  <label for="mine">difficulté</label>
+  <select id="mine">
+    <option value="1" selected="selected">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+  </select>
+  <button id="creation">
+  Créer
+  </button>
+</div>
+
+<div id="demineur" style="display:none;">
+
+
+<label for="X">Axe horizontal</label>
+<input type="number" id="X">
+<label for="Y">Axe vertical</label>
+<input type="number" id="Y">
+<button id="update">
+Tester
+</button>
+<div id="result"></div>
+
+</div>
+<script>
+
+function demineur (wide, mine) {
+   
+    switch(mine){
+        case "1":
+            tabArr = [1,1,0,0,0,0,0,0,0,0,0]
+            break;
+        case "2":
+            tabArr = [1,1,1,0,0,0,0,0,0,0,0]
+            break;
+        case "3":
+            tabArr = [1,1,1,1,0,0,0,0,0,0,0]
+            break;
+    }
+    
+    grid = [];
+    for(i=0;i<wide;i++) {
+    	t = [];
+        for(j=0;j<wide;j++) {
+            val = parseInt(Math.random()*tabArr.length);
+            t.push(tabArr[val]);
+        }
+        grid.push(t);
+    }
+	
+    this.testValue = function (x, y) {
+    	x=parseInt(x);
+        y=parseInt(y);
+        try {
+            test = grid[x][y];
+        } catch(e) {
+            return 'Les coordonnées dépassent la taille de la grille';
+        }
+        nb = 0;
+     	index = grid.length-1;
+      
+        if(x === 0) {
+            nb = grid[x+1][y]; 
+            switch(y) {
+              case 0:
+              	nb+=grid[x+1][y+1]+grid[x][y+1];
+              break;
+              case index:
+              	nb+=grid[x+1][y-1]+grid[x][y-1];
+              break;
+              default:
+              	nb+=grid[x+1][y-1]+grid[x+1][y+1]+grid[x][y+1]+grid[x][y-1];
+              break;
+            }
+        } else if(x === index) {
+            nb = grid[x-1][y];
+            switch(y) {
+              case 0:
+              	nb+=grid[x-1][y+1]+grid[x][y+1];
+              break;
+              case index:
+              	nb+=grid[x-1][y-1]+grid[x][y-1];
+              break;
+              default:
+              	nb+=grid[x-1][y-1]+grid[x-1][y+1]+grid[x][y+1]+grid[x][y-1];
+              break;
+            }
+        } else if(y === 0 && x != 0 && x != index) {
+        		nb += grid[x][y+1]+grid[x+1][y+1]+grid[x+1][y]+grid[x-1][y+1]+grid[x-1][y];
+        } else if(y === index && x != 0 && x != index) {
+        		nb += grid[x][y-1]+grid[x+1][y-1]+grid[x+1][y]+grid[x-1][y-1]+grid[x-1][y];
+        } else {
+            for(n=-1;n<2;n++) {
+            		nb += grid[x+n][y+n]+grid[x][y+n]+grid[x+n][y];
+            }
+        }
+				
+      
+    if(test) return 'perdu' ; else return ':) il y a '+nb+' mine(s) autour du point '+x+'/'+y;
+    }
+}
+
+     
+function update() {
+    x = document.getElementById('X').value;
+    y = document.getElementById('Y').value;
+    test = demineur.testValue(x,y);
+    par = document.getElementsByTagName('p');
+    document.getElementById('result').innerHTML += '<p>'+test+'</p>';
+}
+
+function create() {
+    e1 = document.getElementById('wide');
+    wide = e1.options[e1.selectedIndex].value;
+    e2 = document.getElementById('mine');
+    mine = e2.options[e2.selectedIndex].value;
+    demineur = new demineur(wide, mine);
+    document.getElementById('create').style.display = 'none';
+    document.getElementById('demineur').style.display = 'block';
+}
+
+var el1 = document.getElementById("update"); 
+el1.addEventListener("click", update, false); 
+var el2 = document.getElementById("creation"); 
+el2.addEventListener("click", create, false); 
+
+</script>
+
+</body>
+</html>
